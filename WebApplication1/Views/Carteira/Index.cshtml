@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Carteiras</title>
+    <style>
+        :root {
+            --primary-color: #6c5ce7;
+            --secondary-color: #a29bfe;
+            --bg-color: #f9f9fb;
+            --text-color: #2d3436;
+            --success-color: #00b894;
+            --danger-color: #d63031;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            width: 100%;
+            max-width: 700px;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .form-inline {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #636e72;
+        }
+
+        input[type="text"], select {
+            padding: 10px;
+            border: 1.5px solid #dfe6e9;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+        }
+
+        button.btn-save {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            height: 41px;
+        }
+
+            button.btn-save:hover {
+                background-color: #5b4bc4;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #f1f1f1;
+            color: #636e72;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .badge-active {
+            background: #e3fcf7;
+            color: var(--success-color);
+        }
+
+        .badge-inactive {
+            background: #fff0f0;
+            color: var(--danger-color);
+        }
+
+        .btn-del {
+            background: none;
+            border: none;
+            color: #b2bec3;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: color 0.2s;
+        }
+
+            .btn-del:hover {
+                color: var(--danger-color);
+            }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Carteiras Disponíveis</h2>
+
+        <div class="form-inline">
+            <div class="input-group">
+                <label>Código</label>
+                <input type="text" id="cart-cod" placeholder="Ex: CRT-01">
+            </div>
+            <div class="input-group">
+                <label>Nome da Carteira</label>
+                <input type="text" id="cart-nome" placeholder="Ex: Investimentos">
+            </div>
+            <div class="input-group">
+                <label>Status</label>
+                <select id="cart-ativa">
+                    <option value="Sim">Ativa</option>
+                    <option value="Não">Inativa</option>
+                </select>
+            </div>
+            <button class="btn-save" onclick="salvar()">Adicionar</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Nome</th>
+                    <th>Status</th>
+                    <th style="width: 50px;"></th>
+                </tr>
+            </thead>
+            <tbody id="tabela-corpo"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let carteiras = [
+            { cod: "C001", nome: "Carteira Principal", ativa: "Sim" },
+            { cod: "C002", nome: "Reserva de Emergência", ativa: "Não" }
+        ];
+
+        function renderizar() {
+            const corpo = document.getElementById('tabela-corpo');
+            corpo.innerHTML = '';
+
+            carteiras.forEach((c, index) => {
+                const badgeClass = c.ativa === 'Sim' ? 'badge-active' : 'badge-inactive';
+                corpo.innerHTML += `
+                    <tr>
+                        <td style="font-family: monospace; font-weight: bold;">${c.cod}</td>
+                        <td>${c.nome}</td>
+                        <td><span class="badge ${badgeClass}">${c.ativa === 'Sim' ? 'Ativa' : 'Inativa'}</span></td>
+                        <td><button class="btn-del" onclick="remover(${index})">&times;</button></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function salvar() {
+            const cod = document.getElementById('cart-cod').value;
+            const nome = document.getElementById('cart-nome').value;
+            const ativa = document.getElementById('cart-ativa').value;
+
+            if(!cod || !nome) return alert("Preencha o Código e o Nome!");
+
+            carteiras.push({ cod, nome, ativa });
+            document.getElementById('cart-cod').value = '';
+            document.getElementById('cart-nome').value = '';
+            renderizar();
+        }
+
+        function remover(i) {
+            if(confirm("Excluir esta carteira?")) {
+                carteiras.splice(i, 1);
+                renderizar();
+            }
+        }
+
+        window.onload = renderizar;
+    </script>
+
+</body>
+</html>

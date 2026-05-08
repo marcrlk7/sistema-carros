@@ -1,0 +1,236 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Funcionários</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #27ae60;
+            --bg-color: #f0f2f5;
+            --text-color: #333;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        /* Estilização do Formulário */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+            .form-grid input, .form-grid select {
+                padding: 10px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 14px;
+            }
+
+        .btn-add {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+            .btn-add:hover {
+                background-color: #219150;
+            }
+
+        /* Estilização da Tabela */
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            min-width: 800px;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: left;
+            padding: 12px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Cadastro de Funcionários</h1>
+
+        <!-- Formulário -->
+        <div class="form-grid">
+            <input type="text" id="cod" placeholder="Cód.">
+            <input type="text" id="nome" placeholder="Nome Completo">
+            <select id="sexo">
+                <option value="">Sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+                <option value="Outro">Outro</option>
+            </select>
+            <input type="text" id="cidade" placeholder="Cidade">
+            <input type="text" id="estado" placeholder="UF" maxlength="2">
+            <input type="text" id="funcao" placeholder="Função">
+            <button class="btn-add" onclick="addFuncionario()">Salvar</button>
+        </div>
+
+        <!-- Tabela -->
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Sexo</th>
+                        <th>Cidade</th>
+                        <th>Estado</th>
+                        <th>Função</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="listaFuncionarios">
+                    <!-- Conteúdo JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let funcionarios = [
+            { cod: "101", nome: "Ana Silva", sexo: "F", cidade: "Curitiba", estado: "PR", funcao: "Analista" },
+            { cod: "102", nome: "Carlos Souza", sexo: "M", cidade: "Rio de Janeiro", estado: "RJ", funcao: "Gerente" }
+        ];
+
+        function render() {
+            const corpo = document.getElementById('listaFuncionarios');
+            corpo.innerHTML = '';
+
+            if (funcionarios.length === 0) {
+                corpo.innerHTML = '<tr><td colspan="7" class="empty-row">Nenhum funcionário cadastrado.</td></tr>';
+                return;
+            }
+
+            funcionarios.forEach((f, i) => {
+                const row = `<tr>
+                    <td>${f.cod}</td>
+                    <td>${f.nome}</td>
+                    <td>${f.sexo}</td>
+                    <td>${f.cidade}</td>
+                    <td>${f.estado}</td>
+                    <td>${f.funcao}</td>
+                    <td><button class="btn-delete" onclick="remover(${i})">Excluir</button></td>
+                </tr>`;
+                corpo.innerHTML += row;
+            });
+        }
+
+        function addFuncionario() {
+            const dados = {
+                cod: document.getElementById('cod').value,
+                nome: document.getElementById('nome').value,
+                sexo: document.getElementById('sexo').value,
+                cidade: document.getElementById('cidade').value,
+                estado: document.getElementById('estado').value.toUpperCase(),
+                funcao: document.getElementById('funcao').value
+            };
+
+            if (Object.values(dados).some(v => v === '')) {
+                alert("Preencha todos os campos!");
+                return;
+            }
+
+            funcionarios.push(dados);
+
+            // Limpar campos
+            document.getElementById('cod').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('sexo').value = '';
+            document.getElementById('cidade').value = '';
+            document.getElementById('estado').value = '';
+            document.getElementById('funcao').value = '';
+
+            render();
+        }
+
+        function remover(index) {
+            funcionarios.splice(index, 1);
+            render();
+        }
+
+        window.onload = render;
+    </script>
+
+</body>
+</html>
